@@ -1,0 +1,194 @@
+<!--
+ * @Date         : 2020-03-07 11:38:15
+ * @LastEditors  : 曾迪
+ * @LastEditTime : 2020-03-07 16:20:46
+ * @FilePath     : \测试的APP\html\cart.html
+ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style >
+         body,
+    header,
+    section,
+    footer,
+    div,
+    ul,
+    ol,
+    li,
+    img,
+    a,
+    span,
+    em,
+    del,
+    legend,
+    center,
+    strong,
+    var,
+    fieldset,
+    form,
+    label,
+    dl,
+    dt,
+    dd,
+    cite,
+    input,
+    hr,
+    time,
+    mark,
+    code,
+    figcaption,
+    figure,
+    textarea,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p {
+      margin: 0;
+      border: 0;
+      padding: 0;
+      font-style: normal;
+    }
+
+    li {
+      list-style: none;
+    }
+    header{
+      height: .88rem;
+      text-align: center;
+      line-height: .88rem;
+      background-color: #fff;;
+    }
+    body {
+      font-size: .26rem;
+      background: #f5f5f5;
+    }
+        ul.list .goods{
+            /* height: 2rem; */
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            box-sizing: border-box;
+            padding: .25rem;
+        }
+        .goods img{
+            width: 1rem;
+            height: 1rem;
+        }
+        .handle{
+            display: flex;
+            
+        }
+        .jian,.add{
+            padding: .18rem;
+            border-radius: 50%;
+            border: 1px solid #ddd;
+        }
+        .num{
+            margin: .2rem .25rem;
+        }
+        .left{
+            width: 1.3rem;
+            background-image: url("../image/c.png");
+            background-repeat: no-repeat;
+            background-size: .6rem .6rem;
+
+        }
+        .active{
+            background-image: url("../image/a.png");
+        }
+    </style>
+</head>
+<body>
+    <header id="header">购物车</header>
+    <main id="warp">
+        <ul class="list">
+            <li class="goods" v-for="(item, index) in list">
+                <div class="left" :class="{active: index==0}" @click="">
+                </div>
+                <div class="right">
+                    <div class="pic">
+                        <img :src="item.imgPath" alt="">
+                    </div>
+                    <div class="content">
+                        <div class="title">{{item.goodsName}}</div>
+                        <div class="message">{{item.message}}</div>
+                        <div class="price">{{item.goodsMoney}}</div>
+                    </div>
+                    <div class="handle">
+                        <div class="jian" @click="jian(index)">-</div>
+                        <div class="num" >{{item.num}}</div>
+                        <div class="add" @click="addNum(index)">+</div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </main>
+    <script type="text/javascript" src="../script/rem.js"></script>
+    <script type="text/javascript" src="../script/vue.min.js"></script>
+    <script>
+          apiready = function () {
+      document.getElementById("header").style.paddingTop = api.safeArea.top + 'px';
+      init()
+    }
+    function init(){
+        new Vue({
+        el: "#warp",
+        data: {
+          list: [],
+          num:1
+        },
+        mounted: function () {
+          this.getData();
+        },
+        methods: {
+            //获取购物车的东西
+          getData: function () {
+            var _this = this;
+            api.ajax({
+              "headers": {
+                "X-APICloud-AppId": "A6018891110653",
+                "X-APICloud-AppKey": "491e1911f5e51e8069b2e6185eb2606da60f38df.1583223810271"
+
+              },
+
+              url: 'https://d.apicloud.com/mcm/api/car',
+              method: 'get',
+              timeout: 30,
+              dataType: 'json',
+              returnAll: false
+            }, function (ret, err) {
+              console.log(JSON.stringify(ret))
+              console.log(JSON.stringify(err))
+              if (ret) {
+                // TODO 
+                _this.list = ret;
+              } else {
+                api.alert({
+                  msg: ('错误码：' + err.code + '；错误信息：' + err.msg + '网络状态码：' + err.statusCode)
+                });
+              };
+            });
+          },
+          jian: function(index){
+              if(this.list[index].num<=1){
+                  api.toast({msg: '不能减了。'})
+                  return
+              }
+              this.list[index].num --
+          },
+          addNum: function(index){
+            this.list[index].num++
+          }
+        }
+      })
+    }
+    </script>
+</body>
+</html>

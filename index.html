@@ -1,0 +1,198 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+        content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>Hello APP</title>
+    <style type="text/css">
+        body,
+        header,
+        section,
+        footer,
+        div,
+        ul,
+        ol,
+        li,
+        img,
+        a,
+        span,
+        em,
+        del,
+        legend,
+        center,
+        strong,
+        var,
+        fieldset,
+        form,
+        label,
+        dl,
+        dt,
+        dd,
+        cite,
+        input,
+        hr,
+        time,
+        mark,
+        code,
+        figcaption,
+        figure,
+        textarea,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        p {
+            margin: 0;
+            border: 0;
+            padding: 0;
+            font-style: normal;
+        }
+
+        li {
+            list-style: none;
+        }
+        body{
+            font-size: .26rem;
+            background: #fff;
+        }
+        footer {
+            position: fixed;
+            bottom: 0;
+            border-top: 1px solid #eeeeee;
+            height: .98rem;
+            width: 100%;
+            display: -webkit-box;
+            display: flex;
+        }
+
+        footer .cell {
+            -webkit-box-flex: 1;
+            flex: 1;
+            text-align: center;
+        }
+
+
+        footer .cell .text {
+            line-height: .98rem;
+            font-size: .22rem;
+        }
+        footer .cell.active {
+      color: greenyellow; }
+
+    </style>
+
+
+<body>
+    <div id="warp" v-clock>
+
+        <footer ref="footer">
+            <div class="cell" :class="{active: index == currentIndex}" v-for="(item, index) in datalist" :key="index"
+                @click="changeTab(index)" tapmode>
+                <div class="text">
+                    {{item.text}}
+                </div>
+            </div>
+        </footer>
+    </div>
+
+</body>
+<script type="text/javascript" src="./script/rem.js"></script>
+<!-- <script type="text/javascript" src="./script/wr.js"></script> -->
+<script type="text/javascript" src="./script/vue.min.js"></script>
+<!-- <script type="text/javascript" src="./script/api.js"></script> -->
+<script>
+    apiready = function(){
+        api.setStatusBarStyle({
+            style: 'dark',
+            color: 'transparent'
+        });
+        init();
+    }
+       
+
+    function init() {
+        new Vue({
+            el: "#warp",
+            data: {
+                datalist: [
+                    {
+                        text: '首页商品'
+                    },
+                    {
+                        text: '购物车'
+                    }
+                ],
+                currentIndex: 0,
+                token: ''
+            },
+            mounted: function () {
+                // 优化点击事件
+                // api.parseTapmode();
+
+                this.openPages();
+
+            },
+            methods: {
+                changeTab: function (index) {
+
+                    this.currentIndex = index;
+                    api.setFrameGroupIndex({
+                        name: 'pages',
+                        index: index,
+                        scroll: true,
+                        reload: true
+                    });
+
+                },
+                openPages: function () {
+                    //防止底部被遮挡
+                    this.$refs.footer.style.paddingBottom = api.safeArea.bottom + 'px';
+                    var footerH = this.$refs.footer.offsetHeight;
+                    var pagename = ['home', 'cart'];
+                    var frameList = [];
+                    for (var i = 0; i < 3; i++) {
+                        frameList.push({
+                            name: 'page' + i,
+                            url: 'html/' + pagename[i] + '.html',
+                            allowEdit: true,
+                            vScrollBarEnabled: false,
+                            bounces: false
+                        });
+                    }
+                    api.openFrameGroup({
+                        name: 'pages',
+                        scrollEnabled: false,
+                        rect: {
+                            marginTop: 0,
+                            marginLeft: 0,
+                            marginRight: 0,
+                            marginBottom: footerH
+                        },
+                        index: 0,
+                        frames: frameList,
+                        preload: 3
+                    }, function (ret, err) {
+                        var name = ret.name;
+                        var index = ret.index;
+                        // console.log(index)
+
+                    });
+                    api.setFrameGroupIndex({
+                        name: 'pages',
+                        index: 0
+                    });
+                    // console.log("重新执行了")
+                }
+            }
+        });
+
+    }
+
+</script>
+
+</html>
